@@ -27,6 +27,10 @@ pub struct BuildCmd {
     /// Output path for the built rpm (either a file or directory)
     #[options(long = "output")]
     pub output: Option<String>,
+
+    /// RPM Version
+    #[options(long = "rpm-version")]
+    pub rpm_version: Option<String>,
 }
 
 impl Runnable for BuildCmd {
@@ -59,8 +63,13 @@ impl Runnable for BuildCmd {
             p.display().to_string()
         });
 
+        let mut package = config.package().clone();
+        if let Some(rpm_version) = &self.rpm_version {
+            package.version = rpm_version.to_owned();
+        }
+
         Builder::new(
-            config.package(),
+            &package,
             self.verbose,
             self.no_cargo_build,
             self.target.as_ref(),
